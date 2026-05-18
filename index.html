@@ -16,20 +16,21 @@ h1{text-align:center;font-size:1.6rem;margin-bottom:6px;color:#f1f5f9}
 #btn:disabled{background:#475569;cursor:not-allowed}
 #hbtn{background:#0ea5e9}
 #hbtn:hover{background:#0284c7}
-.tw{overflow-x:auto;max-width:1300px;margin:0 auto}
+.tw{overflow-x:auto;max-width:1400px;margin:0 auto}
 table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:14px;overflow:hidden;border:1px solid #334155}
 thead tr{background:#0f172a}
-th{padding:14px 18px;text-align:left;font-size:.8rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+th{padding:12px 14px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
 th.r,td.r{text-align:right}
-td{padding:15px 18px;font-size:.95rem;border-top:1px solid #334155}
+td{padding:13px 14px;font-size:.9rem;border-top:1px solid #334155}
 tr:hover td{background:#263348}
 .nm{font-weight:600;color:#cbd5e1}
-.ad{font-size:.68rem;color:#475569;font-family:monospace;word-break:break-all}
+.ad{font-size:.65rem;color:#475569;font-family:monospace;word-break:break-all}
 .ad a{color:#94a3b8;text-decoration:none;transition:color .2s}
 .ad a:hover{color:#e84142;text-decoration:underline}
 .tv{color:#f87171;font-weight:700}
 .uv{color:#34d399;font-weight:700}
-.pv{color:#fbbf24;font-weight:700}
+.d2v{color:#a78bfa;font-weight:700}
+.d1v{color:#fbbf24;font-weight:700}
 .lc{color:#64748b;font-style:italic;font-size:.85rem}
 .ec{color:#f87171;font-size:.8rem}
 .up{color:#34d399;font-weight:700}
@@ -41,6 +42,7 @@ tr.tot td{background:#0f172a;font-weight:700;font-size:1rem;color:#f1f5f9;border
 .ok{background:#34d399}.er{background:#f87171}
 .ld{background:#fbbf24;animation:p 1s infinite}
 @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.date-label{font-size:.65rem;color:#64748b;margin-bottom:2px}
 /* 히스토리 모달 */
 .modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
 .modal-bg.show{display:flex}
@@ -62,13 +64,13 @@ tr.tot td{background:#0f172a;font-weight:700;font-size:1rem;color:#f1f5f9;border
   .sub{font-size:.75rem;margin-bottom:16px}
   #btn,#hbtn{padding:8px 16px;font-size:.85rem}
   table{border-radius:8px}
-  th{padding:8px 5px;font-size:.65rem;letter-spacing:0;white-space:nowrap}
-  td{padding:9px 5px;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .nm{font-size:.75rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .tv,.uv,.pv{font-size:.75rem}
+  th{padding:8px 5px;font-size:.62rem;letter-spacing:0;white-space:nowrap}
+  td{padding:9px 5px;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nm{font-size:.72rem;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tv,.uv,.d2v,.d1v{font-size:.72rem}
   .stat-txt{display:none}.dot{margin-right:0}
   tr.tot td{font-size:.8rem;padding:9px 5px}
-  .col-addr,.col-prev,.col-diff{display:none}
+  .col-addr,.col-d2,.col-d1{display:none}
 }
 </style>
 </head>
@@ -87,8 +89,8 @@ tr.tot td{background:#0f172a;font-weight:700;font-size:1rem;color:#f1f5f9;border
     <th class="col-addr">주소</th>
     <th class="r">TRX</th>
     <th class="r">USDT (실시간)</th>
-    <th class="r col-prev">전일마감 USDT</th>
-    <th class="r col-diff">증감</th>
+    <th class="r col-d2" id="th-d2">D-2 (23:59)</th>
+    <th class="r col-d1" id="th-d1">D-1 (23:59)</th>
     <th>상태</th>
   </tr>
 </thead>
@@ -137,6 +139,43 @@ function isMobile(){return window.innerWidth<=768;}
 function fmt(n){if(n==null||isNaN(n))return"-";return Number(n).toLocaleString("ko-KR",{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtDiff(d){if(d==null||isNaN(d))return"<span class='eq'>-</span>";if(d>0)return"<span class='up'>▲ +"+fmt(d)+"</span>";if(d<0)return"<span class='dn'>▼ "+fmt(d)+"</span>";return"<span class='eq'>— 0.00</span>";}
 
+/* KST 날짜 문자열 YYYY-MM-DD */
+function getKSTDateStr(offsetDays){
+  var kst=new Date(Date.now()+9*3600*1000+(offsetDays||0)*86400*1000);
+  return kst.toISOString().slice(0,10);
+}
+
+/* history에서 특정 날짜 23:59에 가장 가까운(이하) 레코드 찾기 */
+function getSnapshotNear2359(dateStr){
+  /* 해당 날짜 레코드들 필터 */
+  var dayRecs=historyData.filter(function(h){return h.ts&&h.ts.startsWith(dateStr);});
+  if(!dayRecs.length){
+    /* 해당 날짜 데이터 없으면 null */
+    return null;
+  }
+  /* 23:59에 가장 가까운 것 선택 (시간순 정렬 후 마지막) */
+  dayRecs.sort(function(a,b){return a.ts<b.ts?-1:1;});
+  /* 23:59 이전 중 가장 마지막 */
+  var before2359=dayRecs.filter(function(h){
+    var t=h.ts.slice(11,16);/* "HH:MM" */
+    return t<="23:59";
+  });
+  return before2359.length?before2359[before2359.length-1]:dayRecs[dayRecs.length-1];
+}
+
+/* D-2, D-1 날짜 */
+function getD2Str(){return getKSTDateStr(-2);}
+function getD1Str(){return getKSTDateStr(-1);}
+
+/* 특정 스냅샷에서 지갑별 usdt 배열 */
+function getBalancesFromSnapshot(snap){
+  if(!snap) return W.map(function(){return null;});
+  return W.map(function(w){
+    var found=snap.wallets&&snap.wallets.find(function(x){return x.a===w.a;});
+    return found!=null?found.usdt:null;
+  });
+}
+
 function b58hex(addr){
   var AB="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
   var num=BigInt(0);
@@ -153,47 +192,51 @@ function getUSDT(addr){
   return fetch(NODE+"/wallet/triggersmartcontract",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({owner_address:addr,contract_address:USDT_C,function_selector:"balanceOf(address)",parameter:param,visible:true})}).then(function(r){return r.json();}).then(function(d){var hex=d&&d.constant_result&&d.constant_result[0];if(!hex)return 0;return parseInt(hex,16)/1e6;});
 }
 
-/* 전일마감: history에서 어제 마지막 레코드 */
-function getYesterdayStr(){
-  var kst=new Date(Date.now()+9*3600*1000);
-  kst.setUTCDate(kst.getUTCDate()-1);
-  return kst.toISOString().slice(0,10);
-}
-function getPrevBalances(){
-  var yStr=getYesterdayStr();
-  var prev=historyData.filter(function(h){return h.ts&&h.ts.startsWith(yStr);});
-  if(!prev.length) return W.map(function(){return null;});
-  var last=prev[prev.length-1];
-  return W.map(function(w,i){
-    var found=last.wallets&&last.wallets.find(function(x){return x.a===w.a;});
-    return found?found.usdt:null;
-  });
-}
-
 function initTable(){
-  var tb=document.getElementById("tb");tb.innerHTML="";
   var mobile=isMobile();
-  var prevBalances=getPrevBalances();
+  var d2str=getD2Str();
+  var d1str=getD1Str();
+  var d2snap=getSnapshotNear2359(d2str);
+  var d1snap=getSnapshotNear2359(d1str);
+  var d2bal=getBalancesFromSnapshot(d2snap);
+  var d1bal=getBalancesFromSnapshot(d1snap);
+
+  /* 헤더 날짜 업데이트 */
+  var th2=document.getElementById("th-d2");
+  var th1=document.getElementById("th-d1");
+  if(th2) th2.innerHTML=d2str+"<br><span style='color:#a78bfa;font-size:.7rem'>23:59 USDT</span>";
+  if(th1) th1.innerHTML=d1str+"<br><span style='color:#fbbf24;font-size:.7rem'>23:59 USDT</span>";
+
+  var tb=document.getElementById("tb");tb.innerHTML="";
   for(var i=0;i<W.length;i++){
-    var prev=prevBalances[i];
+    var d2=d2bal[i];
+    var d1=d1bal[i];
     var tr=document.createElement("tr");
     tr.innerHTML="<td class='nm'>"+W[i].n+"</td>"
       +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a></td>")
       +"<td class='r lc' id='t"+i+"'>-</td>"
       +"<td class='r lc' id='u"+i+"'>-</td>"
-      +(mobile?"":"<td class='r col-prev'><span class='pv' id='p"+i+"'>"+(prev!=null?fmt(prev):"<span class='lc'>-</span>")+"</span></td>")
-      +(mobile?"":"<td class='r col-diff' id='df"+i+"'><span class='eq'>-</span></td>")
+      +(mobile?"":"<td class='r col-d2'><span class='d2v'>"+(d2!=null?fmt(d2):"<span class='lc'>-</span>")+"</span></td>")
+      +(mobile?"":"<td class='r col-d1'><span class='d1v'>"+(d1!=null?fmt(d1):"<span class='lc'>-</span>")+"</span></td>")
       +"<td><span class='dot ld' id='d"+i+"'></span><span class='stat-txt' id='s"+i+"'>로딩</span></td>";
     tb.appendChild(tr);
   }
+
+  /* 합계 행 */
   var tf=document.createElement("tr");tf.className="tot";
-  var prevBalances2=getPrevBalances();
-  var hasPrev=prevBalances2.some(function(v){return v!=null;});
-  var totalPrev=prevBalances2.reduce(function(a,v){return a+(v||0);},0);
+  var d2total=d2bal.reduce(function(a,v){return a+(v||0);},0);
+  var d1total=d1bal.reduce(function(a,v){return a+(v||0);},0);
+  var hasD2=d2bal.some(function(v){return v!=null;});
+  var hasD1=d1bal.some(function(v){return v!=null;});
   if(mobile){
     tf.innerHTML="<td style='text-align:right;padding-right:8px'>합 계</td><td class='r tv' id='tt'>-</td><td class='r uv' id='tu'>-</td><td></td>";
   } else {
-    tf.innerHTML="<td colspan='2' style='text-align:right;padding-right:8px'>합 계</td><td class='r tv' id='tt'>-</td><td class='r uv' id='tu'>-</td><td class='r pv' id='tp'>"+(hasPrev?fmt(totalPrev):"-")+"</td><td class='r' id='tdf'><span class='eq'>-</span></td><td></td>";
+    tf.innerHTML="<td colspan='2' style='text-align:right;padding-right:8px'>합 계</td>"
+      +"<td class='r tv' id='tt'>-</td>"
+      +"<td class='r uv' id='tu'>-</td>"
+      +"<td class='r d2v'>"+(hasD2?fmt(d2total):"-")+"</td>"
+      +"<td class='r d1v'>"+(hasD1?fmt(d1total):"-")+"</td>"
+      +"<td></td>";
   }
   tb.appendChild(tf);
 }
@@ -205,27 +248,12 @@ function loadAll(){
   document.getElementById("upd").textContent="";
   var tT=0,tU=0,done=0;
   currentBalances=new Array(W.length).fill(null);
-  var prevBalances=getPrevBalances();
 
-  function updateDiff(i,now){
-    var prev=prevBalances[i];
-    var el=document.getElementById("df"+i);
-    if(el) el.innerHTML=fmtDiff(prev!=null?now-prev:null);
-    if(currentBalances.every(function(v){return v!=null;})){
-      var tdfEl=document.getElementById("tdf");
-      if(tdfEl){
-        var totalNow=currentBalances.reduce(function(a,v){return a+v;},0);
-        var hasPrev=prevBalances.some(function(v){return v!=null;});
-        var totalPrev=prevBalances.reduce(function(a,v){return a+(v||0);},0);
-        tdfEl.innerHTML=hasPrev?fmtDiff(totalNow-totalPrev):"<span class='eq'>-</span>";
-      }
-    }
-  }
   function upd(){document.getElementById("tt").textContent=fmt(tT);document.getElementById("tu").textContent=fmt(tU);}
   function finish(){
     done++;
     if(done===W.length){
-      document.getElementById("upd").textContent="마지막 조회: "+new Date().toLocaleString("ko-KR")+" | 전일마감 기준: "+getYesterdayStr();
+      document.getElementById("upd").textContent="마지막 조회: "+new Date().toLocaleString("ko-KR")+" | D-2: "+getD2Str()+" | D-1: "+getD1Str();
       btn.disabled=false;btn.textContent="🔄 전체 조회";
     }
   }
@@ -238,7 +266,7 @@ function loadAll(){
         document.getElementById("u"+i).innerHTML="<span class='uv'>"+fmt(res[1])+"</span>";
         document.getElementById("d"+i).className="dot ok";
         var s=document.getElementById("s"+i);if(s)s.textContent="완료";
-        updateDiff(i,res[1]);finish();
+        finish();
       }).catch(function(){
         document.getElementById("t"+i).innerHTML="<span class='ec'>오류</span>";
         document.getElementById("u"+i).innerHTML="<span class='ec'>오류</span>";
@@ -284,7 +312,7 @@ function renderHist(){
     var prevH=idx>0?data[idx-1]:null;
     var prevVal=prevH?(sel==="total"?prevH.totalUsdt:(function(){var w=prevH.wallets&&prevH.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})() ):null;
     var diff=prevVal!=null&&val!=null?val-prevVal:null;
-    return "<tr><td class='ts-col'>"+h.ts+"</td><td class='r pv'>"+fmt(val)+"</td><td class='r'>"+fmtDiff(diff)+"</td></tr>";
+    return "<tr><td class='ts-col'>"+h.ts+"</td><td class='r' style='color:#34d399;font-weight:700'>"+fmt(val)+"</td><td class='r'>"+fmtDiff(diff)+"</td></tr>";
   }).reverse().join("");
   document.getElementById("histContent").innerHTML="<table class='hist-table'><thead><tr><th>수집시각 (KST)</th><th class='r'>USDT</th><th class='r'>전회 대비</th></tr></thead><tbody>"+rows+"</tbody></table>";
 }
