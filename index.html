@@ -217,7 +217,7 @@ function initTable(){
     var d1=d1bal[i];
     var tr=document.createElement("tr");
     tr.innerHTML="<td class='nm'>"+W[i].n+"<button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>"
-      +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a></td>")
+      +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a> <button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>")
       +"<td class='r lc' id='t"+i+"'>-</td>"
       +"<td class='r lc' id='u"+i+"'>-</td>"
       +(mobile?"":"<td class='r col-d2'><span class='d2v'>"+(d2!=null?fmt(d2):"<span class='lc'>-</span>")+"</span></td>")
