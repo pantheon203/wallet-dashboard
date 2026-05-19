@@ -20,7 +20,7 @@ h1{text-align:center;font-size:1.6rem;margin-bottom:6px;color:#f1f5f9}
 table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:14px;overflow:hidden;border:1px solid #334155}
 thead tr{background:#0f172a}
 th{padding:12px 14px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-th.r,td.r{text-align:right}
+th.r,td.r{text-align:right}h
 td{padding:13px 14px;font-size:.9rem;border-top:1px solid #334155}
 tr:hover td{background:#263348}
 .nm{font-weight:600;color:#cbd5e1}
@@ -217,7 +217,7 @@ function initTable(){
     var d1=d1bal[i];
     var tr=document.createElement("tr");
     tr.innerHTML="<td class='nm'>"+W[i].n+"<button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>"
-      +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a> <button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>")
+      +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a></td>")
       +"<td class='r lc' id='t"+i+"'>-</td>"
       +"<td class='r lc' id='u"+i+"'>-</td>"
       +(mobile?"":"<td class='r col-d2'><span class='d2v'>"+(d2!=null?fmt(d2):"<span class='lc'>-</span>")+"</span></td>")
