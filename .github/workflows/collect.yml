@@ -2,7 +2,7 @@ name: Collect Wallet Balances
 
 on:
   schedule:
-    - cron: '0 * * * *'
+        - cron: '59 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -22,16 +22,16 @@ jobs:
           const fs = require('fs');
 
           const WALLETS = [
-            {n:"전체콜드월렛", a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"},
-            {n:"USDT핫",       a:"TWZbStS7AvDPh9NuJ6FDd7BxB6KRGZBeYM"},
-            {n:"위너 핫월렛",  a:"TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA"},
-            {n:"닥터 핫월렛",  a:"TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud"},
-            {n:"아바 핫월렛",  a:"TRwtFvARK8cry73mJbDwRaekv34EKk3uLZ"},
-            {n:"시오디 핫월렛",a:"TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H"},
-            {n:"수기지갑",     a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK"},
-            {n:"환전지갑",     a:"TUZCK3Ngv5bv9rK8gp9oXWYar9hd7YRiwi"},
-            {n:"예스벳지갑",   a:"TP97htFMo1NtKNGQWwMS4BSgzcP7BmGzm4"},
-            {n:"케이플지갑",   a:"TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1"}
+                      {n:"\uc544\ubc14 \ud56b\uc6d4\ub81b",      a:"TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf"},
+                                {n:"\ub2e5\ud130 \ud56b\uc6d4\ub81b",    a:"TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud"},
+                                          {n:"\uc218\uae30\uc9c0\uac11",            a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK"},
+                                                    {n:"USDT\ud56b",                          a:"TWZbStS7AvDPh9NuJ6FDd7BxB6KRGZBeYM"},
+                                                              {n:"\uc608\uc2a4\ubcb3\uc9c0\uac11",      a:"TP97htFMo1NtKNGQWwMS4BSgzcP7BmGzm4"},
+                                                                        {n:"\ud658\uc804\uc9c0\uac11",            a:"TUZCK3Ngv5bv9rK8gp9oXWYar9hd7YRiwi"},
+                                                                                  {n:"\uc2dc\uc624\ub514 \ud56b\uc6d4\ub81b",a:"TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H"},
+                                                                                            {n:"\uc804\uccb4\ucf5c\ub4dc\uc6d4\ub81b",a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"},
+                                                                                                      {n:"\uc704\ub108 \ud56b\uc6d4\ub81b",    a:"TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA"},
+                                                                                                                {n:"\ucf00\uc774\ud50c\uc9c0\uac11",      a:"TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1"}
           ];
 
           const NODE = 'https://trx.mytokenpocket.vip';
