@@ -123,17 +123,16 @@ tr.tot td{background:#0f172a;font-weight:700;font-size:1rem;color:#f1f5f9;border
 
 <script>
 var W=[
-  {n:"전체콜드월렛",a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"},
+  {n:"아바 핫월렛",a:"TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf",c:1},
+  {n:"닥터 핫월렛",a:"TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud",c:1},
+  {n:"수기지갑",a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK",c:1},
   {n:"USDT핫",a:"TWZbStS7AvDPh9NuJ6FDd7BxB6KRGZBeYM"},
-  {n:"위너 핫월렛",a:"TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA"},
-  {n:"닥터 핫월렛",a:"TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud"},
-  {n:"아바 핫월렛",a:"TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf"},
-  {n:"시오디 핫월렛",a:"TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H"},
-  {n:"수기지갑",a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK"},
-  {n:"환전지갑",a:"TUZCK3Ngv5bv9rK8gp9oXWYar9hd7YRiwi"},
   {n:"예스벳지갑",a:"TP97htFMo1NtKNGQWwMS4BSgzcP7BmGzm4"},
+  {n:"환전지갑",a:"TUZCK3Ngv5bv9rK8gp9oXWYar9hd7YRiwi"},
+  {n:"시오디 핫월렛",a:"TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H"},
+  {n:"전체콜드월렛",a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"},
   {n:"케이플지갑",a:"TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1"}
-];
+  ];
 var NODE="https://trx.mytokenpocket.vip";
 var USDT_C="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
 var historyData=[];
@@ -216,7 +215,7 @@ function initTable(){
     var d2=d2bal[i];
     var d1=d1bal[i];
     var tr=document.createElement("tr");
-    tr.innerHTML="<td class='nm'>"+W[i].n+"<button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>"
+          tr.innerHTML="<td class='nm'"+(W[i].c?" style='color:#e84142'":"")+">"+W[i].n+"<button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>"
       +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a></td>")
       +"<td class='r lc' id='t"+i+"'>-</td>"
       +"<td class='r lc' id='u"+i+"'>-</td>"
