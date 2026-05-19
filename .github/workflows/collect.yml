@@ -2,7 +2,7 @@ name: Collect Wallet Balances
 
 on:
   schedule:
-        - cron: '59 * * * *'
+            - cron: '55 * * * *'
   workflow_dispatch:
 
 jobs:
