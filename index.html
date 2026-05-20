@@ -80,11 +80,11 @@
   </head>
   <body>
     <h1>💼 지갑 잔액 현황</h1>
-  <p class="sub">TRX · USDT(TRC-20) 실시간 잔액 조회</p>p>
+  <p class="sub">TRX · USDT(TRC-20) 실시간 잔액 조회</p>
   <div class="bw">
-  <button id="btn" onclick="loadAll()">🔄 전체 조회</button>button>
-  <button id="hbtn" onclick="openHistory()">📊 히스토리</button>button>
-  </div>div>
+  <button id="btn" onclick="loadAll()">🔄 전체 조회</button>
+  <button id="hbtn" onclick="openHistory()">📊 히스토리</button>
+  </div>
   <div class="tw">
   <table>
     <thead>
@@ -98,28 +98,28 @@
     <th>상태</th>
       </tr>
     </thead>
-  <tbody id="tb"></tbody>tbody>
+  <tbody id="tb"></tbody>
   </table>
-  </div>div>
-  <div class="upd" id="upd"></div>div>
+  </div>
+  <div class="upd" id="upd"></div>
   
   <!-- 히스토리 모달 -->
   <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeHistory()">
   <div class="modal">
-  <button class="modal-close" onclick="closeHistory()">✕ 닫기</button>button>
+  <button class="modal-close" onclick="closeHistory()">✕ 닫기</button>
   <h2>📊 USDT 수집 히스토리</h2>
   <div class="hist-filter">
   <select id="walletFilter" onchange="renderHist()">
-  <option value="total">전체 합계</option>option>
-  </select>select>
+  <option value="total">전체 합계</option>
+  </select>
   <input type="date" id="dateFrom" onchange="renderHist()"/>
-  <span style="color:#64748b;align-self:center">~</span>span>
+  <span style="color:#64748b;align-self:center">~</span>
   <input type="date" id="dateTo" onchange="renderHist()"/>
-  <button onclick="clearDateFilter()" style="background:#334155;border:none;color:#e2e8f0;padding:6px 12px;border-radius:6px;cursor:pointer">전체기간</button>button>
-  </div>div>
-  <div id="histContent">데이터 로딩 중...</div>div>
-  </div>div>
-  </div>div>
+  <button onclick="clearDateFilter()" style="background:#334155;border:none;color:#e2e8f0;padding:6px 12px;border-radius:6px;cursor:pointer">전체기간</button>
+  </div>
+  <div id="histContent">데이터 로딩 중...</div>
+  </div>
+  </div>
   
   <script>
     var W=[
@@ -338,13 +338,6 @@
       t._timer=setTimeout(function(){t.classList.remove('show');},2000);
     }
   </script>
-    <div class="toast" id="toast"></div>div>
+    <div class="toast" id="toast"></div>
   </body>
-</html>html>
-  </script></th></th>
-      </tr>
-    </thead>
-  </table></h1>
-  </body>
-  </style></title>
-  </head>
+</html>
