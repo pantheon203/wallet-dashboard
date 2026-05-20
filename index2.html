@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>지갑 잔액 현황</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;padding:40px 20px}
+    h1{text-align:center;font-size:1.6rem;margin-bottom:6px;color:#f1f5f9}
+    .sub{text-align:center;color:#64748b;font-size:.85rem;margin-bottom:28px}
+    .bw{display:flex;justify-content:center;gap:12px;margin-bottom:30px;flex-wrap:wrap}
+    #btn,#hbtn{padding:12px 36px;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer}
+    #btn{background:#e84142}
+    #btn:hover{background:#c0392b}
+    #btn:disabled{background:#475569;cursor:not-allowed}
+    #hbtn{background:#0ea5e9}
+    #hbtn:hover{background:#0284c7}
+    .tw{overflow-x:auto;max-width:1400px;margin:0 auto}
+    table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:14px;overflow:hidden;border:1px solid #334155}
+    thead tr{background:#0f172a}
+    th{padding:12px 14px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    th.r,td.r{text-align:right}
+    td{padding:18px 14px;font-size:.9rem;border-top:1px solid #334155}
+    tr:hover td{background:#263348}
+    .nm{font-weight:600;color:#cbd5e1}
+    .ad{font-size:.65rem;color:#475569;font-family:monospace;word-break:break-all}
+    .ad a{color:#94a3b8;text-decoration:none;transition:color .2s}
+    .ad a:hover{color:#e84142;text-decoration:underline}
+    .tv{color:#f87171;font-weight:700}
+    .uv{color:#34d399;font-weight:700}
+    .d2v{color:#a78bfa;font-weight:700}
+    .d1v{color:#fbbf24;font-weight:700}
+    .lc{color:#64748b;font-style:italic;font-size:.85rem}
+    .ec{color:#f87171;font-size:.8rem}
+    .up{color:#34d399;font-weight:700}
+    .dn{color:#f87171;font-weight:700}
+    .eq{color:#64748b}
+    .copy-btn{display:inline-block;margin-left:5px;padding:1px 6px;background:#334155;color:#94a3b8;border:none;border-radius:4px;font-size:.6rem;cursor:pointer;vertical-align:middle;line-height:1.6}
+    .copy-btn:active{background:#e84142;color:#fff}
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e293b;color:#34d399;border:1px solid #34d399;padding:8px 20px;border-radius:20px;font-size:.85rem;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+    .toast.show{opacity:1}
+    tr.tot td{background:#0f172a;font-weight:700;font-size:1rem;color:#f1f5f9;border-top:2px solid #e84142}
+    .upd{text-align:center;margin-top:16px;font-size:.78rem;color:#475569}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    .ok{background:#34d399}.er{background:#f87171}
+    .ld{background:#fbbf24;animation:p 1s infinite}
+    @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+    .date-label{font-size:.65rem;color:#64748b;margin-bottom:2px}
+    /* 히스토리 모달 */
+    .modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
+    .modal-bg.show{display:flex}
+    .modal{background:#1e293b;border-radius:16px;border:1px solid #334155;padding:24px;width:95%;max-width:900px;max-height:85vh;overflow-y:auto}
+    .modal h2{color:#f1f5f9;margin-bottom:16px;font-size:1.2rem}
+    .modal-close{float:right;background:#475569;border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer}
+    .modal-close:hover{background:#e84142}
+    .hist-filter{margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap}
+    .hist-filter select,.hist-filter input{background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:6px 10px;border-radius:6px;font-size:.85rem}
+    .hist-table{width:100%;border-collapse:collapse;font-size:.85rem}
+    .hist-table th{padding:8px 12px;background:#0f172a;color:#64748b;text-align:left;position:sticky;top:0}
+    .hist-table th.r,.hist-table td.r{text-align:right}
+    .hist-table td{padding:8px 12px;border-top:1px solid #2d3748}
+    .hist-table tr:hover td{background:#263348}
+    .ts-col{color:#94a3b8;font-size:.75rem;white-space:nowrap}
+    @media(max-width:768px){
+      body{padding:20px 6px}
+      h1{font-size:1.1rem}
+      .sub{font-size:.75rem;margin-bottom:16px}
+      #btn,#hbtn{padding:8px 16px;font-size:.85rem}
+      table{border-radius:8px}
+      th{padding:8px 5px;font-size:.62rem;letter-spacing:0;white-space:nowrap}
+      td{padding:9px 5px;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .nm{font-size:.72rem;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .tv,.uv,.d2v,.d1v{font-size:.72rem}
+      .stat-txt{display:none}.dot{margin-right:0}
+      tr.tot td{font-size:.8rem;padding:9px 5px}
+      .col-addr,.col-d2,.col-d1{display:none}
+    }
+    </style>
+  </head>
+  <body>
+    <h1>💼 지갑 잔액 현황</h1>
+  <p class="sub">TRX · USDT(TRC-20) 실시간 잔액 조회</p>
+  <div class="bw">
+  <button id="btn" onclick="loadAll()">🔄 전체 조회</button>
+  <button id="hbtn" onclick="openHistory()">📊 히스토리</button>
+  </div>
+  <div class="tw">
+  <table>
+    <thead>
+      <tr>
+        <th>지갑명</th>
+    <th class="col-addr">주소</th>
+    <th class="r">TRX</th>
+    <th class="r">USDT</th>
+    <th class="r col-d2" id="th-d2">D-2 (23:55)</th>
+    <th class="r col-d1" id="th-d1">D-1 (23:55)</th>
+    <th>상태</th>
+      </tr>
+    </thead>
+  <tbody id="tb"></tbody>
+  </table>
+  </div>
+  <div class="upd" id="upd"></div>
+  
+  <!-- 히스토리 모달 -->
+  <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeHistory()">
+  <div class="modal">
+  <button class="modal-close" onclick="closeHistory()">✕ 닫기</button>
+  <h2>📊 USDT 수집 히스토리</h2>
+  <div class="hist-filter">
+  <select id="walletFilter" onchange="renderHist()">
+  <option value="total">전체 합계</option>
+  </select>
+  <input type="date" id="dateFrom" onchange="renderHist()"/>
+  <span style="color:#64748b;align-self:center">~</span>
+  <input type="date" id="dateTo" onchange="renderHist()"/>
+  <button onclick="clearDateFilter()" style="background:#334155;border:none;color:#e2e8f0;padding:6px 12px;border-radius:6px;cursor:pointer">전체기간</button>
+  </div>
+  <div id="histContent">데이터 로딩 중...</div>
+  </div>
+  </div>
+  
+  <script>
+    var W=[
+{n:"아바",a:"TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf",c:1},
+{n:"시오디",a:"TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H",c:1},
+{n:"닥터",a:"TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud",c:1},
+{n:"위너",a:"TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA",c:1},
+{n:"수기",a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK",c:1},
+{n:"케이플",a:"TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1",c:1},
+{n:"콜드월렛",a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"}
+];
+    var NODE="https://trx.mytokenpocket.vip";
+    var USDT_C="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+    var historyData=[];
+    var currentBalances=[];
+
+    function isMobile(){return window.innerWidth<=768;}
+    function fmt(n){if(n==null||isNaN(n))return"-";return Number(n).toLocaleString("ko-KR",{minimumFractionDigits:2,maximumFractionDigits:2});}
+    function fmtDiff(d){if(d==null||isNaN(d))return"<span class='eq'>-</span>";if(d>0)return"<span class='up'>▲ +"+fmt(d)+"</span>";if(d<0)return"<span class='dn'>▼ "+fmt(d)+"</span>";return"<span class='eq'>— 0.00</span>";}
+
+    /* KST 날짜 문자열 YYYY-MM-DD */
+    function getKSTDateStr(offsetDays){
+      var kst=new Date(Date.now()+9*3600*1000+(offsetDays||0)*86400*1000);
+      return kst.toISOString().slice(0,10);
+    }
+
+    /* history에서 특정 날짜 23:55에 가장 가까운(이하) 레코드 찾기 */
+    function getSnapshotNear2355(dateStr){
+      var dayRecs=historyData.filter(function(h){return h.ts&&h.ts.startsWith(dateStr);});
+      if(!dayRecs.length){return null;}
+      dayRecs.sort(function(a,b){return a.ts<b.ts?-1:1;});
+      var before2355=dayRecs.filter(function(h){
+        var t=h.ts.slice(11,16);
+        return t<="23:55";
+      });
+      return before2355.length?before2355[before2355.length-1]:dayRecs[dayRecs.length-1];
+    }
+
+    /* D-2, D-1 날짜 */
+    function getD2Str(){return getKSTDateStr(-2);}
+    function getD1Str(){return getKSTDateStr(-1);}
+
+    /* 특정 스냅샷에서 지갑별 usdt 배열 */
+    function getBalancesFromSnapshot(snap){
+      if(!snap) return W.map(function(){return null;});
+      return W.map(function(w){
+        var found=snap.wallets&&snap.wallets.find(function(x){return x.a===w.a;});
+        return found!=null?found.usdt:null;
+      });
+    }
+
+    function b58hex(addr){
+      var AB="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+      var num=BigInt(0);
+      for(var i=0;i<addr.length;i++) num=num*BigInt(58)+BigInt(AB.indexOf(addr[i]));
+      var hex=num.toString(16);
+      while(hex.length<50) hex="0"+hex;
+      return hex.slice(2,42);
+    }
+    function getTRX(addr){
+      return fetch(NODE+"/wallet/getaccount",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({address:addr,visible:true})}).then(function(r){return r.json();}).then(function(d){return(d.balance||0)/1e6;});
+    }
+    function getUSDT(addr){
+      var param=b58hex(addr);while(param.length<64)param="0"+param;
+      return fetch(NODE+"/wallet/triggersmartcontract",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({owner_address:addr,contract_address:USDT_C,function_selector:"balanceOf(address)",parameter:param,visible:true})}).then(function(r){return r.json();}).then(function(d){var hex=d&&d.constant_result&&d.constant_result[0];if(!hex)return 0;return parseInt(hex,16)/1e6;});
+    }
+
+    function initTable(){
+      var mobile=isMobile();
+      var d2str=getD2Str();
+      var d1str=getD1Str();
+      var d2snap=getSnapshotNear2355(d2str);
+      var d1snap=getSnapshotNear2355(d1str);
+      var d2bal=getBalancesFromSnapshot(d2snap);
+      var d1bal=getBalancesFromSnapshot(d1snap);
+
+      /* 헤더 날짜 업데이트 */
+      var th2=document.getElementById("th-d2");
+      var th1=document.getElementById("th-d1");
+      if(th2) th2.innerHTML=d2str+"<br><span style='color:#a78bfa;font-size:.7rem'>23:55 USDT</span>";
+      if(th1) th1.innerHTML=d1str+"<br><span style='color:#fbbf24;font-size:.7rem'>23:55 USDT</span>";
+
+      var tb=document.getElementById("tb");tb.innerHTML="";
+      for(var i=0;i<W.length;i++){
+        var d2=d2bal[i];
+        var d1=d1bal[i];
+        var tr=document.createElement("tr");
+        tr.innerHTML="<td class='nm'"+(W[i].c?" style='color:#e84142'":"")+">"+W[i].n+"<button class='copy-btn' onclick='copyAddr("+i+")'>복사</button></td>"
+        +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a></td>")
+        +"<td class='r lc' id='t"+i+"'>-</td>"
+        +"<td class='r lc' id='u"+i+"'>-</td>"
+        +(mobile?"":"<td class='r col-d2'><span class='d2v'>"+(d2!=null?fmt(d2):"<span class='lc'>-</span>")+"</span></td>")
+        +(mobile?"":"<td class='r col-d1'><span class='d1v'>"+(d1!=null?fmt(d1):"<span class='lc'>-</span>")+"</span></td>")
+        +"<td><span class='dot ld' id='d"+i+"'></span><span class='stat-txt' id='s"+i+"'>로딩</span></td>";
+        tb.appendChild(tr);
+      }
+
+      /* 합계 행 */
+      var tf=document.createElement("tr");tf.className="tot";
+      var d2total=d2bal.reduce(function(a,v){return a+(v||0);},0);
+      var d1total=d1bal.reduce(function(a,v){return a+(v||0);},0);
+      var hasD2=d2bal.some(function(v){return v!=null;});
+      var hasD1=d1bal.some(function(v){return v!=null;});
+      if(mobile){
+        tf.innerHTML="<td style='text-align:right;padding-right:8px'>합 계</td><td class='r tv' id='tt'>-</td><td class='r uv' id='tu'>-</td><td></td>";
+      } else {
+        tf.innerHTML="<td colspan='2' style='text-align:right;padding-right:8px'>합 계</td>"
+        +"<td class='r tv' id='tt'>-</td>"
+        +"<td class='r uv' id='tu'>-</td>"
+        +"<td class='r d2v'>"+(hasD2?fmt(d2total):"-")+"</td>"
+        +"<td class='r d1v'>"+(hasD1?fmt(d1total):"-")+"</td>"
+        +"<td></td>";
+      }
+      tb.appendChild(tf);
+    }
+
+    function loadAll(){
+      var btn=document.getElementById("btn");
+      btn.disabled=true;btn.textContent="조회 중...";
+      initTable();
+      document.getElementById("upd").textContent="";
+      var tT=0,tU=0,done=0;
+      currentBalances=new Array(W.length).fill(null);
+
+      function upd(){document.getElementById("tt").textContent=fmt(tT);document.getElementById("tu").textContent=fmt(tU);}
+      function finish(){
+        done++;
+        if(done===W.length){
+          document.getElementById("upd").textContent="마지막 조회: "+new Date().toLocaleString("ko-KR")+" | D-2: "+getD2Str()+" | D-1: "+getD1Str();
+          btn.disabled=false;btn.textContent="🔄 전체 조회";
+        }
+      }
+      for(var i=0;i<W.length;i++){
+        (function(i,w){
+          Promise.all([getTRX(w.a),getUSDT(w.a)]).then(function(res){
+            tT+=res[0];tU+=res[1];upd();
+            currentBalances[i]=res[1];
+            document.getElementById("t"+i).innerHTML="<span class='tv'>"+fmt(res[0])+"</span>";
+            document.getElementById("u"+i).innerHTML="<span class='uv'>"+fmt(res[1])+"</span>";
+            document.getElementById("d"+i).className="dot ok";
+            var s=document.getElementById("s"+i);if(s)s.textContent="완료";
+            finish();
+          }).catch(function(){
+            document.getElementById("t"+i).innerHTML="<span class='ec'>오류</span>";
+            document.getElementById("u"+i).innerHTML="<span class='ec'>오류</span>";
+            document.getElementById("d"+i).className="dot er";
+            var s=document.getElementById("s"+i);if(s)s.textContent="실패";finish();
+          });
+    })(i,W[i]);
+      }
+    }
+
+    /* ── 히스토리 ── */
+    function loadHistory(){
+      return fetch('data/history2.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){
+        historyData=Array.isArray(d)?d:[];
+        var sel=document.getElementById("walletFilter");
+        sel.innerHTML="<option value='total'>전체 합계</option>";
+        W.forEach(function(w){var o=document.createElement("option");o.value=w.a;o.textContent=w.n;sel.appendChild(o);});
+      }).catch(function(){historyData=[];});
+    }
+
+    function openHistory(){
+      document.getElementById("modalBg").classList.add("show");
+      document.getElementById("histContent").textContent="로딩 중...";
+      loadHistory().then(renderHist);
+    }
+    function closeHistory(){document.getElementById("modalBg").classList.remove("show");}
+    function clearDateFilter(){document.getElementById("dateFrom").value="";document.getElementById("dateTo").value="";renderHist();}
+
+    function renderHist(){
+      var sel=document.getElementById("walletFilter").value;
+      var from=document.getElementById("dateFrom").value;
+      var to=document.getElementById("dateTo").value;
+      var data=historyData.filter(function(h){
+        if(!h.ts) return false;
+        var d=h.ts.slice(0,10);
+        if(from && d<from) return false;
+        if(to && d>to) return false;
+        return true;
+      });
+      if(!data.length){document.getElementById("histContent").innerHTML="<p style='color:#64748b;text-align:center;padding:20px'>데이터 없음</p>";return;}
+      var rows=data.map(function(h,idx){
+        var val=sel==="total"?(h.totalUsdt!=null?h.totalUsdt:h.wallets.reduce(function(s,w){return s+(w.usdt||0);},0)):(function(){var w=h.wallets&&h.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})();
+        var prevH=idx>0?data[idx-1]:null;
+        var prevVal=prevH?(sel==="total"?(prevH.totalUsdt!=null?prevH.totalUsdt:prevH.wallets.reduce(function(s,w){return s+(w.usdt||0);},0)):(function(){var w=prevH.wallets&&prevH.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})() ):null;
+        var diff=prevVal!=null&&val!=null?val-prevVal:null;
+        return "<tr><td class='ts-col'>"+h.ts+"</td><td class='r' style='color:#34d399;font-weight:700'>"+fmt(val)+"</td><td class='r'>"+fmtDiff(diff)+"</td></tr>";
+      }).reverse().join("");
+      document.getElementById("histContent").innerHTML="<table class='hist-table'><thead><tr><th>수집시각 (KST)</th><th class='r'>USDT</th><th class='r'>전회 대비</th></tr></thead><tbody>"+rows+"</tbody></table>";
+    }
+
+    window.addEventListener("resize",function(){loadAll();});
+    window.onload=function(){loadHistory().then(function(){loadAll();});};
+
+    function copyAddr(i){
+      var addr=W[i].a;
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(addr).then(function(){showToast(W[i].n+' 주소 복사됨!');}).catch(function(){fallbackCopy(addr);});
+      } else { fallbackCopy(addr); }
+    }
+    function fallbackCopy(text){
+      var ta=document.createElement('textarea');
+      ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.focus();ta.select();
+      try{document.execCommand('copy');showToast('주소 복사됨!');}catch(e){showToast('복사 실패');}
+      document.body.removeChild(ta);
+    }
+    function showToast(msg){
+      var t=document.getElementById('toast');
+      t.textContent=msg;t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer=setTimeout(function(){t.classList.remove('show');},2000);
+    }
+  </script>
+    <div class="toast" id="toast"></div>
+  </body>
+</html>
