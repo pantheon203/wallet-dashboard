@@ -19,7 +19,7 @@ h1{text-align:center;font-size:1.6rem;margin-bottom:6px;color:#f1f5f9}
 .tw{overflow-x:auto;max-width:1400px;margin:0 auto}
 table{width:100%;border-collapse:collapse;background:#1e293b;border-radius:14px;overflow:hidden;border:1px solid #334155}
 thead tr{background:#0f172a}
-th{padding:12px 14px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+th{padding:12px 14px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em}h
 th.r,td.r{text-align:right}
 td{padding:18px 14px;font-size:.9rem;border-top:1px solid #334155}
 tr:hover td{background:#263348}
@@ -312,13 +312,13 @@ function renderHist(){
   });
   if(!data.length){document.getElementById("histContent").innerHTML="<p style='color:#64748b;text-align:center;padding:20px'>데이터 없음</p>";return;}
   var rows=data.map(function(h,idx){
-    var val=sel==="total"?h.totalUsdt:(function(){var w=h.wallets&&h.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})();
+          var val=sel==="total"?(h.totalUsdt!=null?h.totalUsdt:h.wallets.reduce(function(s,w){return s+(w.usdt||0);},0)):(function(){var w=h.wallets&&h.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})();
     var prevH=idx>0?data[idx-1]:null;
-    var prevVal=prevH?(sel==="total"?prevH.totalUsdt:(function(){var w=prevH.wallets&&prevH.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})() ):null;
+          var prevVal=prevH?(sel==="total"?(prevH.totalUsdt!=null?prevH.totalUsdt:prevH.wallets.reduce(function(s,w){return s+(w.usdt||0);},0)):(function(){var w=prevH.wallets&&prevH.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})() ):null;
     var diff=prevVal!=null&&val!=null?val-prevVal:null;
     return "<tr><td class='ts-col'>"+h.ts+"</td><td class='r' style='color:#34d399;font-weight:700'>"+fmt(val)+"</td><td class='r'>"+fmtDiff(diff)+"</td></tr>";
   }).reverse().join("");
-  document.getElementById("histContent").innerHTML="<table class='hist-table'><thead><tr><th>수집시각 (KST)</th><th class='r'>USDT</th><th class='r'>전회 대비</th></tr></thead><tbody>"+rows+"</tbody></table>";
+  document.getElementById("histContent").innerHTML="<table class='hist-table'><thead><tr><th>수집시각 (KST)</th><th class='r'>USDT</th><th class='r'>전회 h대비</th></tr></thead><tbody>"+rows+"</tbody></table>";
 }
 
 window.addEventListener("resize",function(){loadAll();});
