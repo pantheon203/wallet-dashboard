@@ -1,0 +1,110 @@
+name: Collect Wallet Balances 2
+
+on:
+  schedule:
+    - cron: '55 * * * *'
+  workflow_dispatch:
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Collect balances
+        run: |
+          node - <<'JSEOF'
+          const https = require('https');
+          const fs = require('fs');
+
+          const WALLETS = [
+            {n:"\uc544\ubc14",               a:"TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf"},
+            {n:"\uc2dc\uc624\ub514",         a:"TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H"},
+            {n:"\ub2e5\ud130",               a:"TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud"},
+            {n:"\uc704\ub108",               a:"TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA"},
+            {n:"\uc218\uae30",               a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK"},
+            {n:"\ucf00\uc774\ud50c",        a:"TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1"},
+            {n:"\ucf5c\ub4dc\uc6d4\ub81b", a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"}
+          ];
+
+          const NODE = 'https://trx.mytokenpocket.vip';
+          const USDT_C = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+
+          function post(path, body) {
+            return new Promise((resolve, reject) => {
+              const data = JSON.stringify(body);
+              const url = new URL(NODE + path);
+              const opts = {
+                hostname: url.hostname, path: url.pathname, method: 'POST',
+                headers: {'Content-Type':'application/json','Content-Length':Buffer.byteLength(data)}
+              };
+              const req = https.request(opts, res => {
+                let raw = '';
+                res.on('data', c => raw += c);
+                res.on('end', () => { try { resolve(JSON.parse(raw)); } catch(e) { reject(e); } });
+              });
+              req.on('error', reject);
+              req.write(data); req.end();
+            });
+          }
+
+          function b58hex(addr) {
+            const AB = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+            let num = BigInt(0);
+            for (const c of addr) num = num * BigInt(58) + BigInt(AB.indexOf(c));
+            let hex = num.toString(16);
+            while (hex.length < 50) hex = '0' + hex;
+            return hex.slice(2, 42);
+          }
+
+          async function getUSDT(addr) {
+            try {
+              let param = b58hex(addr);
+              while (param.length < 64) param = '0' + param;
+              const d = await post('/wallet/triggersmartcontract', {
+                owner_address: addr, contract_address: USDT_C,
+                function_selector: 'balanceOf(address)', parameter: param, visible: true
+              });
+              const hex = d && d.constant_result && d.constant_result[0];
+              return hex ? parseInt(hex, 16) / 1e6 : 0;
+            } catch(e) { return null; }
+          }
+
+          async function getTRX(addr) {
+            try {
+              const d = await post('/wallet/getaccount', {address: addr, visible: true});
+              return (d.balance || 0) / 1e6;
+            } catch(e) { return null; }
+          }
+
+          async function main() {
+            const kst = new Date(Date.now() + 9 * 3600 * 1000);
+            const ts = kst.toISOString().replace('T',' ').slice(0,16) + ' KST';
+            const results = [];
+            for (const w of WALLETS) {
+              const [trx, usdt] = await Promise.all([getTRX(w.a), getUSDT(w.a)]);
+              results.push({n:w.n, a:w.a, trx, usdt});
+            }
+            const totalUsdt = results.reduce((s,r) => s + (r.usdt||0), 0);
+            let history = [];
+            try { history = JSON.parse(fs.readFileSync('data/history2.json','utf8')); } catch(e) {}
+            history.push({ts, wallets:results, totalUsdt});
+            if (history.length > 720) history = history.slice(-720);
+            fs.writeFileSync('data/history2.json', JSON.stringify(history, null, 2));
+            console.log('Saved:', ts, '| Total USDT:', totalUsdt.toFixed(2));
+          }
+
+          main().catch(e => { console.error(e); process.exit(1); });
+          JSEOF
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/history2.json
+          git diff --staged --quiet || git commit -m "Auto collect2 $(TZ='Asia/Seoul' date '+%Y-%m-%d %H:%M KST')"
+          git push
