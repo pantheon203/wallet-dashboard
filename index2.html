@@ -47,34 +47,6 @@
     .ld{background:#fbbf24;animation:p 1s infinite}
     @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
     .date-label{font-size:.65rem;color:#64748b;margin-bottom:2px}
-    /* 히스토리 모달 */
-    .modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center}
-    .modal-bg.show{display:flex}
-    .modal{background:#1e293b;border-radius:16px;border:1px solid #334155;padding:24px;width:95%;max-width:900px;max-height:85vh;overflow-y:auto}
-    .modal h2{color:#f1f5f9;margin-bottom:16px;font-size:1.2rem}
-    .modal-close{float:right;background:#475569;border:none;color:#fff;padding:4px 12px;border-radius:6px;cursor:pointer}
-    .modal-close:hover{background:#e84142}
-    .hist-filter{margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap}
-    .hist-filter select,.hist-filter input{background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:6px 10px;border-radius:6px;font-size:.85rem}
-    .hist-table{width:100%;border-collapse:collapse;font-size:.85rem}
-    .hist-table th{padding:8px 12px;background:#0f172a;color:#64748b;text-align:left;position:sticky;top:0}
-    .hist-table th.r,.hist-table td.r{text-align:right}
-    .hist-table td{padding:8px 12px;border-top:1px solid #2d3748}
-    .hist-table tr:hover td{background:#263348}
-    .ts-col{color:#94a3b8;font-size:.75rem;white-space:nowrap}
-    @media(max-width:768px){
-      body{padding:20px 6px}
-      h1{font-size:1.1rem}
-      .sub{font-size:.75rem;margin-bottom:16px}
-      #btn,#hbtn{padding:8px 16px;font-size:.85rem}
-      table{border-radius:8px}
-      th{padding:8px 5px;font-size:.62rem;letter-spacing:0;white-space:nowrap}
-      td{padding:9px 5px;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-      .nm{font-size:.72rem;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-      .tv,.uv,.d2v,.d1v{font-size:.72rem}
-      .stat-txt{display:none}.dot{margin-right:0}
-      tr.tot td{font-size:.8rem;padding:9px 5px}
-      .col-addr,.col-d2,.col-d1{display:none}
     }
     </style>
   </head>
@@ -83,7 +55,6 @@
   <p class="sub">TRX · USDT(TRC-20) 실시간 잔액 조회</p>
   <div class="bw">
   <button id="btn" onclick="loadAll()">🔄 전체 조회</button>
-  <button id="hbtn" onclick="openHistory()">📊 히스토리</button>
   </div>
   <div class="tw">
   <table>
@@ -93,8 +64,6 @@
     <th class="col-addr">주소</th>
     <th class="r">TRX</th>
     <th class="r">USDT</th>
-    <th class="r col-d2" id="th-d2">D-2 (23:55)</th>
-    <th class="r col-d1" id="th-d1">D-1 (23:55)</th>
     <th>상태</th>
       </tr>
     </thead>
@@ -102,24 +71,7 @@
   </table>
   </div>
   <div class="upd" id="upd"></div>
-  
-  <!-- 히스토리 모달 -->
-  <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeHistory()">
-  <div class="modal">
-  <button class="modal-close" onclick="closeHistory()">✕ 닫기</button>
-  <h2>📊 USDT 수집 히스토리</h2>
-  <div class="hist-filter">
-  <select id="walletFilter" onchange="renderHist()">
-  <option value="total">전체 합계</option>
-  </select>
-  <input type="date" id="dateFrom" onchange="renderHist()"/>
-  <span style="color:#64748b;align-self:center">~</span>
-  <input type="date" id="dateTo" onchange="renderHist()"/>
-  <button onclick="clearDateFilter()" style="background:#334155;border:none;color:#e2e8f0;padding:6px 12px;border-radius:6px;cursor:pointer">전체기간</button>
-  </div>
-  <div id="histContent">데이터 로딩 중...</div>
-  </div>
-  </div>
+</div>
   
   <script>
     var W=[
@@ -129,7 +81,6 @@
 {n:"위너",a:"TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA",c:1},
 {n:"수기",a:"TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK",c:1},
 {n:"케이플",a:"TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1",c:1},
-{n:"콜드월렛",a:"TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC"}
 ];
     var NODE="https://trx.mytokenpocket.vip";
     var USDT_C="TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
@@ -148,21 +99,10 @@
 
     /* history에서 특정 날짜 23:55에 가장 가까운(이하) 레코드 찾기 */
     function getSnapshotNear2355(dateStr){
-      var dayRecs=historyData.filter(function(h){return h.ts&&h.ts.startsWith(dateStr);});
-      if(!dayRecs.length){return null;}
-      dayRecs.sort(function(a,b){return a.ts<b.ts?-1:1;});
-      var before2355=dayRecs.filter(function(h){
         var t=h.ts.slice(11,16);
         return t<="23:55";
       });
-      return before2355.length?before2355[before2355.length-1]:dayRecs[dayRecs.length-1];
-    }
-
-    /* D-2, D-1 날짜 */
-    function getD2Str(){return getKSTDateStr(-2);}
-    function getD1Str(){return getKSTDateStr(-1);}
-
-    /* 특정 스냅샷에서 지갑별 usdt 배열 */
+    }/* 특정 스냅샷에서 지갑별 usdt 배열 */
     function getBalancesFromSnapshot(snap){
       if(!snap) return W.map(function(){return null;});
       return W.map(function(w){
@@ -189,16 +129,12 @@
 
     function initTable(){
       var mobile=isMobile();
-      var d2str=getD2Str();
-      var d1str=getD1Str();
       var d2snap=getSnapshotNear2355(d2str);
       var d1snap=getSnapshotNear2355(d1str);
       var d2bal=getBalancesFromSnapshot(d2snap);
       var d1bal=getBalancesFromSnapshot(d1snap);
 
       /* 헤더 날짜 업데이트 */
-      var th2=document.getElementById("th-d2");
-      var th1=document.getElementById("th-d1");
       if(th2) th2.innerHTML=d2str+"<br><span style='color:#a78bfa;font-size:.7rem'>23:55 USDT</span>";
       if(th1) th1.innerHTML=d1str+"<br><span style='color:#fbbf24;font-size:.7rem'>23:55 USDT</span>";
 
@@ -211,8 +147,6 @@
         +(mobile?"":"<td class='ad col-addr'><a href='https://tronscan.org/#/address/"+W[i].a+"' target='_blank'>"+W[i].a+"</a></td>")
         +"<td class='r lc' id='t"+i+"'>-</td>"
         +"<td class='r lc' id='u"+i+"'>-</td>"
-        +(mobile?"":"<td class='r col-d2'><span class='d2v'>"+(d2!=null?fmt(d2):"<span class='lc'>-</span>")+"</span></td>")
-        +(mobile?"":"<td class='r col-d1'><span class='d1v'>"+(d1!=null?fmt(d1):"<span class='lc'>-</span>")+"</span></td>")
         +"<td><span class='dot ld' id='d"+i+"'></span><span class='stat-txt' id='s"+i+"'>로딩</span></td>";
         tb.appendChild(tr);
       }
@@ -248,7 +182,6 @@
       function finish(){
         done++;
         if(done===W.length){
-          document.getElementById("upd").textContent="마지막 조회: "+new Date().toLocaleString("ko-KR")+" | D-2: "+getD2Str()+" | D-1: "+getD1Str();
           btn.disabled=false;btn.textContent="🔄 전체 조회";
         }
       }
@@ -271,36 +204,14 @@
     })(i,W[i]);
       }
     }
-
-    /* ── 히스토리 ── */
-    function loadHistory(){
+function loadHistory(){
       return fetch('data/history2.json?t='+Date.now()).then(function(r){return r.json();}).then(function(d){
         historyData=Array.isArray(d)?d:[];
         var sel=document.getElementById("walletFilter");
         sel.innerHTML="<option value='total'>전체 합계</option>";
         W.forEach(function(w){var o=document.createElement("option");o.value=w.a;o.textContent=w.n;sel.appendChild(o);});
       }).catch(function(){historyData=[];});
-    }
-
-    function openHistory(){
-      document.getElementById("modalBg").classList.add("show");
-      document.getElementById("histContent").textContent="로딩 중...";
-      loadHistory().then(renderHist);
-    }
-    function closeHistory(){document.getElementById("modalBg").classList.remove("show");}
-    function clearDateFilter(){document.getElementById("dateFrom").value="";document.getElementById("dateTo").value="";renderHist();}
-
-    function renderHist(){
-      var sel=document.getElementById("walletFilter").value;
-      var from=document.getElementById("dateFrom").value;
-      var to=document.getElementById("dateTo").value;
-      var data=historyData.filter(function(h){
-        if(!h.ts) return false;
-        var d=h.ts.slice(0,10);
-        if(from && d<from) return false;
-        if(to && d>to) return false;
-        return true;
-      });
+    });
       if(!data.length){document.getElementById("histContent").innerHTML="<p style='color:#64748b;text-align:center;padding:20px'>데이터 없음</p>";return;}
       var rows=data.map(function(h,idx){
         var val=sel==="total"?(h.totalUsdt!=null?h.totalUsdt:h.wallets.reduce(function(s,w){return s+(w.usdt||0);},0)):(function(){var w=h.wallets&&h.wallets.find(function(x){return x.a===sel;});return w?w.usdt:null;})();
