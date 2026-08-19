@@ -1,71 +1,5 @@
 [
   {
-    "ts": "2026-06-20 07:49 KST",
-    "wallets": [
-      {
-        "n": "아바 핫월렛",
-        "a": "TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf",
-        "trx": 2870.966272,
-        "usdt": 100523.497765
-      },
-      {
-        "n": "닥터 핫월렛",
-        "a": "TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud",
-        "trx": 3247.877998,
-        "usdt": 66269.540664
-      },
-      {
-        "n": "수기지갑",
-        "a": "TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK",
-        "trx": 0.031036,
-        "usdt": 0
-      },
-      {
-        "n": "USDT핫",
-        "a": "TWZbStS7AvDPh9NuJ6FDd7BxB6KRGZBeYM",
-        "trx": 0.000341,
-        "usdt": 700.289502
-      },
-      {
-        "n": "예스벳지갑",
-        "a": "TP97htFMo1NtKNGQWwMS4BSgzcP7BmGzm4",
-        "trx": 48.5,
-        "usdt": 0
-      },
-      {
-        "n": "환전지갑",
-        "a": "TUZCK3Ngv5bv9rK8gp9oXWYar9hd7YRiwi",
-        "trx": 2107.911629,
-        "usdt": 33810.995648
-      },
-      {
-        "n": "시오디 핫월렛",
-        "a": "TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H",
-        "trx": 3540.042059,
-        "usdt": 98283.509488
-      },
-      {
-        "n": "전체콜드월렛",
-        "a": "TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC",
-        "trx": 146.533304,
-        "usdt": 138553.74043
-      },
-      {
-        "n": "위너 핫월렛",
-        "a": "TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA",
-        "trx": 1676.595372,
-        "usdt": 23001.072165
-      },
-      {
-        "n": "케이플지갑",
-        "a": "TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1",
-        "trx": 1792.338648,
-        "usdt": 46809.870113
-      }
-    ],
-    "totalUsdt": 507952.51577500004
-  },
-  {
     "ts": "2026-06-20 09:03 KST",
     "wallets": [
       {
@@ -47518,5 +47452,71 @@
       }
     ],
     "totalUsdt": 1235863.8317469999
+  },
+  {
+    "ts": "2026-08-19 14:22 KST",
+    "wallets": [
+      {
+        "n": "아바 핫월렛",
+        "a": "TQZzii8nMVnJZjNXcoJmCX8xPRsJMVrhvf",
+        "trx": 2034.314335,
+        "usdt": 85602.414812
+      },
+      {
+        "n": "닥터 핫월렛",
+        "a": "TGn6osTjvAr3h8EvoLHG6USZLTHTy1Brud",
+        "trx": 1981.415427,
+        "usdt": 77105.462951
+      },
+      {
+        "n": "수기지갑",
+        "a": "TMR98yAJoU4LBtEFQmfnT6gCgRpJNBpNyK",
+        "trx": 0.031036,
+        "usdt": 0
+      },
+      {
+        "n": "USDT핫",
+        "a": "TWZbStS7AvDPh9NuJ6FDd7BxB6KRGZBeYM",
+        "trx": 0.000341,
+        "usdt": 0
+      },
+      {
+        "n": "예스벳지갑",
+        "a": "TP97htFMo1NtKNGQWwMS4BSgzcP7BmGzm4",
+        "trx": 48.5,
+        "usdt": 0
+      },
+      {
+        "n": "환전지갑",
+        "a": "TUZCK3Ngv5bv9rK8gp9oXWYar9hd7YRiwi",
+        "trx": 2049.020283,
+        "usdt": 39.145648
+      },
+      {
+        "n": "시오디 핫월렛",
+        "a": "TQ7hoJXbH53R3fpG19KXqTCqrDJY9sRs6H",
+        "trx": 1776.984686,
+        "usdt": 95486.178282
+      },
+      {
+        "n": "전체콜드월렛",
+        "a": "TUMyXbT57Nxc9Cc92Mhgvfu3d7dSGHyvQC",
+        "trx": 2658.077596,
+        "usdt": 858973.929767
+      },
+      {
+        "n": "위너 핫월렛",
+        "a": "TX9j3Z5h465FWbdHoTmgSWjYugbZGXAXJA",
+        "trx": 36.848587,
+        "usdt": 708.16
+      },
+      {
+        "n": "케이플지갑",
+        "a": "TG6BSwYjRSNi6UTxSSr9cfsT3Eqdbw5zw1",
+        "trx": 1660.668034,
+        "usdt": 125357.840587
+      }
+    ],
+    "totalUsdt": 1243273.1320469999
   }
 ]
